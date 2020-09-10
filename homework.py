@@ -50,8 +50,15 @@ class CaloriesCalculator(Calculator):
 
 class CashCalculator(Calculator):
 
-    USD_RATE = 74.50
-    EURO_RATE = 89.30
+    USD_RATE = 60.00
+    EURO_RATE = 70.00
+    RUB_RATE = 1 
+
+    CURRENCY = {
+                'usd':{'rate':USD_RATE , 'name':'USD'},
+                'eur':{'rate':EURO_RATE, 'name':'Euro'},
+                'rub':{'rate':RUB_RATE, 'name':'руб'}
+                }
 
     def get_today_cash_remained(self,currency):
 
@@ -60,22 +67,15 @@ class CashCalculator(Calculator):
         if cash_balance == 0:
             return 'Денег нет, держись'
 
-        else:
-            if currency == 'usd':
-                cash_balance_currency = round(cash_balance / self.USD_RATE, 2)
-                str_currency = 'USD'
-            elif currency == 'eur':
-                cash_balance_currency = round(cash_balance /  self.EURO_RATE, 2)
-                str_currency = 'Euro'
-            elif currency == 'rub':
-                cash_balance_currency = round(cash_balance,2)
-                str_currency = 'руб'
+        else:    
 
+            cash_balance_currency = round(cash_balance / self.CURRENCY[currency]['rate'], 2)
+         
             if cash_balance < 0:
-                return (f'Денег нет, держись: твой долг - {abs(cash_balance_currency)} {str_currency}')
+                return (f'Денег нет, держись: твой долг - {abs(cash_balance_currency)} {self.CURRENCY[currency]["name"]}')
 
             else:    
-                return (f'На сегодня осталось {cash_balance_currency} {str_currency}')
+                return (f'На сегодня осталось {cash_balance_currency} {self.CURRENCY[currency]["name"]}')
 
 
 class Record:
@@ -103,7 +103,7 @@ print(calories_calculator.get_calories_remained())
 cash_calculator = CashCalculator(1000)   
 
 cash_calculator.add_record(Record(amount=145, comment="кофе")) 
-cash_calculator.add_record(Record(amount=300, comment="Серёге за обед"))
+cash_calculator.add_record(Record(amount=3000, comment="Серёге за обед"))
 cash_calculator.add_record(Record(amount=3000, comment="бар в Танин др", date="08.11.2019"))
                 
 print(cash_calculator.get_today_cash_remained("rub"))

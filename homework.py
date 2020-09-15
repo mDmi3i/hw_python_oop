@@ -72,6 +72,7 @@ class Record:
 
     def __init__(self, amount, comment, date=None):
         self.amount = amount
+
         self.comment = comment
         self.date = self.set_now_date(date)
 

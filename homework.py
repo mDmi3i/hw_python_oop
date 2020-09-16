@@ -3,11 +3,12 @@ import datetime as dt
 
 class Calculator:
 
-    now_date = dt.date.today()
-
     def __init__(self, limit):
         self.limit = limit
         self.records = []
+
+    def set_now_date(self):
+        return dt.date.today()
 
     def add_record(self, record):
         self.records.append(record)
@@ -15,7 +16,11 @@ class Calculator:
     def get_balance(self):
         return self.limit - self.get_today_stats()
 
-    def get_period_stat(self, date_start=now_date, date_end=now_date):
+    def get_period_stat(self, date_start=None, date_end=None):
+        if not date_end:
+            date_end = self.set_now_date()
+        if not date_start:
+            date_start = date_end
         return sum(record.amount
                    for record in self.records
                    if (date_start <= record.date
@@ -26,7 +31,7 @@ class Calculator:
 
     def get_week_stats(self):
         period = dt.timedelta(days=6)
-        start_week = self.now_date - period
+        start_week = self.set_now_date() - period
         return self.get_period_stat(start_week)
 
 
@@ -35,7 +40,7 @@ class CaloriesCalculator(Calculator):
     def get_calories_remained(self):
         calories_balance = self.get_balance()
         if calories_balance > 0:
-            return (f'Сегодня можно съесть что-нибудь ещё, но с общей'
+            return ('Сегодня можно съесть что-нибудь ещё, но с общей'
                     f' калорийностью не более {calories_balance} кКал')
         return 'Хватит есть!'
 
@@ -53,26 +58,27 @@ class CashCalculator(Calculator):
                 }
 
     def get_today_cash_remained(self, currency):
-        currency_rate, curency_name = self.CURRENCY[currency]
         cash_balance = self.get_balance()
+
         if cash_balance == 0:
             return 'Денег нет, держись'
 
+        currency_rate, curency_name = self.CURRENCY[currency]
         cash_balance_currency = cash_balance / currency_rate
+
         if cash_balance < 0:
             cash_balance_currency = abs(cash_balance_currency)
-            return (f'Денег нет, держись: твой долг - '
+            return ('Денег нет, держись: твой долг - '
                     f'{cash_balance_currency:.2f} '
                     f'{curency_name}')
-        return (f"На сегодня осталось {cash_balance_currency:.2f} "
-                f"{curency_name}")
+        return (f'На сегодня осталось {cash_balance_currency:.2f} '
+                f'{curency_name}')
 
 
 class Record:
 
     def __init__(self, amount, comment, date=None):
         self.amount = amount
-
         self.comment = comment
         self.date = self.set_now_date(date)
 
@@ -82,7 +88,7 @@ class Record:
         return dt.datetime.strptime(date, '%d.%m.%Y').date()
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     calories_calculator = CaloriesCalculator(1000)
     calories_calculator.add_record(Record(amount=100, comment='чай'))
     calories_calculator.add_record(Record(amount=100, comment='чай'))

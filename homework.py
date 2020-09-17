@@ -7,9 +7,6 @@ class Calculator:
         self.limit = limit
         self.records = []
 
-    def set_now_date(self):
-        return dt.date.today()
-
     def add_record(self, record):
         self.records.append(record)
 
@@ -17,9 +14,9 @@ class Calculator:
         return self.limit - self.get_today_stats()
 
     def get_period_stat(self, date_start=None, date_end=None):
-        if not date_end:
-            date_end = self.set_now_date()
-        if not date_start:
+        if date_end is None:
+            date_end = dt.date.today()
+        if date_start is None:
             date_start = date_end
         return sum(record.amount
                    for record in self.records
@@ -31,7 +28,7 @@ class Calculator:
 
     def get_week_stats(self):
         period = dt.timedelta(days=6)
-        start_week = self.set_now_date() - period
+        start_week = dt.date.today() - period
         return self.get_period_stat(start_week)
 
 
@@ -83,7 +80,7 @@ class Record:
         self.date = self.set_now_date(date)
 
     def set_now_date(self, date):
-        if not date:
+        if date is None:
             return dt.date.today()
         return dt.datetime.strptime(date, '%d.%m.%Y').date()
 
